@@ -46,6 +46,8 @@ Detailed documentation for each component can be found in the `docs/` directory:
 - [**Configuration System**](docs/config.md)
 - [**Testing Guide**](docs/testing.md)
 - [**Deployment Guide**](docs/deployment.md)
+- [**Project Structure Overview**](docs/structure.md)
+- [**Contributing Guidelines**](CONTRIBUTING.md)
 
 ## 🏗️ Architecture
 
