@@ -1,0 +1,5 @@
+pathway
+litellm
+streamlit
+python-dotenv
+pandas
