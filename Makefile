@@ -1,4 +1,4 @@
-.PHONY: setup run-backend run-frontend run-all clean docker-build docker-run
+.PHONY: setup run-backend run-frontend run-all test clean docker-build docker-run
 
 # Variables
 PYTHON = python3
@@ -10,16 +10,19 @@ setup:
 	./venv/bin/pip install -r requirements.txt
 
 run-backend:
-	$(PYTHON) src/backend/pipeline.py
+	PYTHONPATH=. $(PYTHON) src/backend/pipeline.py
 
 run-frontend:
-	$(STREAMLIT) run src/frontend/dashboard.py
+	PYTHONPATH=. $(STREAMLIT) run src/frontend/dashboard.py
 
 run-all:
 	@echo "Starting backend and frontend..."
 	mkdir -p data
 	touch data/ui_output.csv
-	$(PYTHON) src/backend/pipeline.py & $(STREAMLIT) run src/frontend/dashboard.py
+	PYTHONPATH=. $(PYTHON) src/backend/pipeline.py & PYTHONPATH=. $(STREAMLIT) run src/frontend/dashboard.py
+
+test:
+	PYTHONPATH=. $(PYTHON) -m pytest tests/
 
 clean:
 	rm -rf data/*.csv

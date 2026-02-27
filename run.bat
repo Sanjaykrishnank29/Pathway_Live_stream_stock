@@ -3,7 +3,9 @@ REM Windows runner script for Green Bharat Live AI
 
 echo Creating data directory if it doesn't exist...
 if not exist "data" mkdir data
-type nul > data\ui_output.csv
+if not exist "data\ui_output.csv" type nul > data\ui_output.csv
+
+set PYTHONPATH=%CD%
 
 echo Starting Backend Pipeline...
 start "Pathway Backend" cmd /c "python src/backend/pipeline.py"

@@ -3,3 +3,4 @@ litellm
 streamlit
 python-dotenv
 pandas
+pytest
