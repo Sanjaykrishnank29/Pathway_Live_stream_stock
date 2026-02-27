@@ -20,11 +20,16 @@ This document provides a comprehensive overview of every file and directory in t
 
 ### `src/backend/`
 - **`src/backend/__init__.py`**: Initializer for the backend package.
-- **`src/backend/pipeline.py`**: Pathway streaming pipeline and LLM reasoning logic.
+- **`src/backend/pipeline.py`**: Orchestration of the Pathway pipeline.
+- **`src/backend/models.py`**: Pydantic/Pathway data schemas.
+- **`src/backend/streaming.py`**: Real-time data stream generators.
+- **`src/backend/utils.py`**: LLM prompts and retry decorators.
+- **`src/backend/analytics.py`**: Domain-specific ESG logic.
 
 ### `src/frontend/`
 - **`src/frontend/__init__.py`**: Initializer for the frontend package.
-- **`src/frontend/dashboard.py`**: Streamlit-based real-time dashboard.
+- **`src/frontend/dashboard.py`**: Main Streamlit dashboard.
+- **`src/frontend/components.py`**: Reusable UI component library.
 
 ## `docs/` (Documentation)
 

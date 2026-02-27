@@ -1,12 +1,13 @@
-import os
-import random
 import logging
-from typing import Any, Dict
+import os
 
 import pathway as pw
 from pathway.xpacks.llm.llms import LiteLLMChat
 
 from src.config import Config
+from src.backend.streaming import get_market_data_stream
+from src.backend.utils import create_esg_prompt
+from src.backend.analytics import classify_esg_risk
 
 # Configure logging
 logging.basicConfig(
@@ -15,84 +16,52 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class GreenAssetSchema(pw.Schema):
-    """Schema for incoming green asset data stream."""
-
-    company: str
-    esg_score: int
-
-
 class SustainabilityPipeline:
-    """Pathway pipeline for computing ESG reasoning."""
+    """
+    Modular Pathway pipeline for computing ESG reasoning and analytics.
+    """
 
     def __init__(self, output_path: str = Config.OUTPUT_PATH):
         self.output_path = output_path
         self._setup_model()
 
     def _setup_model(self) -> None:
-        """Initialize the LLM reasoning model."""
+        """Initialize the LLM reasoning model from LiteLLM."""
         if not Config.GROQ_API_KEY:
-            logger.warning("GROQ_API_KEY not found in environment. LLM calls may fail.")
+            logger.error(
+                "GROQ_API_KEY missing. Pipeline will not be able to generate insights."
+            )
 
         self.model = LiteLLMChat(
             model=Config.LLM_MODEL,
             api_key=Config.GROQ_API_KEY,
         )
 
-    def _get_data_stream(self) -> Any:
-        """Create a simulated live data stream."""
-        return pw.demo.generate_custom_stream(
-            {
-                "company": lambda _: random.choice(
-                    [
-                        "Adani Green",
-                        "Tata Power",
-                        "Suzlon",
-                        "Reliance New Energy",
-                        "Jindal Renewables",
-                    ]
-                ),
-                "esg_score": lambda _: random.randint(60, 98),
-            },
-            schema=GreenAssetSchema,
-            input_rate=Config.INPUT_RATE,
-        )
+    def _build_pipeline(self) -> pw.Table:
+        """Construction of the reactive data processing pipeline."""
+        streaming_data = get_market_data_stream()
 
-    def _build_pipeline(self) -> Any:
-        """Build the Pathway reasoning pipeline."""
-        streaming_data = self._get_data_stream()
-
-        # Reasoning layer setup
-        def create_prompt(company: str, esg_score: int) -> list[Dict[str, str]]:
-            return [
-                {
-                    "role": "user",
-                    "content": (
-                        f"As an ESG expert, analyze the sustainability efforts of {company} "
-                        f"which has an ESG score of {esg_score}. Provide a concise 2-sentence insight."
-                    ),
-                }
-            ]
-
+        # Apply reasoning and analytics logic
         responses = streaming_data.select(
             pw.this.company,
             pw.this.esg_score,
+            risk_level=pw.apply(classify_esg_risk, pw.this.esg_score),
             ai_analysis=self.model(
-                pw.apply(create_prompt, pw.this.company, pw.this.esg_score)
+                pw.apply(create_esg_prompt, pw.this.company, pw.this.esg_score)
             ),
         )
         return responses
 
     def run(self) -> None:
-        """Execute the Pathway pipeline."""
-        logger.info(f"Starting Pathway pipeline. Writing output to {self.output_path}")
+        """Main execution loop for the Pathway streaming engine."""
+        logger.info(f"🚀 Initializing Green Bharat Pipeline. Sink: {self.output_path}")
 
-        # Ensure directory exists
+        # Ensure directory infrastructure exists
         os.makedirs(os.path.dirname(self.output_path), exist_ok=True)
 
         responses = self._build_pipeline()
 
-        # Write to CSV for UI consumption
+        # Persist structured output for downstream consumption (Streamlit)
         pw.io.csv.write(responses, self.output_path)
         pw.run()
 

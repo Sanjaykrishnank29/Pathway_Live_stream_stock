@@ -5,13 +5,19 @@ The backend of **Green Bharat: Live AI Market Intelligence** is powered by the [
 ## Components
 
 ### 1. `src/backend/pipeline.py`
-This is the heart of the streaming engine. It manages data ingestion, schema validation, and integration with the Groq LLM.
+The orchestration layer that assembles the Pathway reactive graph using modular components.
 
-- **`GreenAssetSchema`**: Defines the structure of the incoming data (company name and ESG score).
-- **`SustainabilityPipeline`**: The main class orchestrating the flow.
-    - `_get_data_stream()`: Generates a simulated real-time stream of market data.
-    - `_build_pipeline()`: Defines the logic for selecting data and applying the LLM reasoning layer using `pw.apply`.
-    - `run()`: Executes the pipeline and writes the output to a persistent CSV for the frontend.
+### 2. `src/backend/models.py`
+Contains the **`GreenAssetSchema`**, defining the structure of the incoming data.
+
+### 3. `src/backend/streaming.py`
+Encapsulates **`get_market_data_stream()`**, which simulates high-frequency sustainability market feeds.
+
+### 4. `src/backend/utils.py`
+Provides utility functions like **`create_esg_prompt()`** and advanced **`retry_llm_call`** decorators for robust API interaction.
+
+### 5. `src/backend/analytics.py`
+Contains domain-specific logic such as **`classify_esg_risk()`** and trend detection algorithms.
 
 ## AI Reasoning Layer
 The pipeline uses `LiteLLMChat` from Pathway's LLM pack to interface with **Groq's Llama 3.1** models. The reasoning is performed asynchronously on the streaming data, providing real-time insights based on the ESG scores.
