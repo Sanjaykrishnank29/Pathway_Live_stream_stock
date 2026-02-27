@@ -37,6 +37,16 @@ A real-time sustainability and ESG analysis platform that leverages **Pathway** 
 └── README.md                   # This file
 ```
 
+## 📚 Documentation
+
+Detailed documentation for each component can be found in the `docs/` directory:
+
+- [**Backend (Pathway Pipeline)**](docs/backend.md)
+- [**Frontend (Streamlit UI)**](docs/frontend.md)
+- [**Configuration System**](docs/config.md)
+- [**Testing Guide**](docs/testing.md)
+- [**Deployment Guide**](docs/deployment.md)
+
 ## 🏗️ Architecture
 
 ```mermaid
